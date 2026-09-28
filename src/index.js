@@ -71,11 +71,163 @@ async function main() {
         }
     ];
 
+    let proximoId = reservas.length + 1;
+
+    // Middleware de validación aplicado únicamente al POST /reservas.
+    // Normaliza los datos recibidos, verifica cada regla del formulario y,
+    // ante un error, corta el ciclo con un 400 conservando lo que el usuario
+    // ya había escrito. Si todo es válido, deja los datos listos en
+    // req.reservaValidada y delega en el handler final con next().
+    function validarReserva(req, res, next) {
+        const cuerpo = req.body || {};
+
+        const valores = {
+            estudiante: String(cuerpo.estudiante ?? "").trim(),
+            email: String(cuerpo.email ?? "").trim(),
+            sala: String(cuerpo.sala ?? "").trim(),
+            fecha: String(cuerpo.fecha ?? "").trim(),
+            turno: String(cuerpo.turno ?? "").trim(),
+            personas: cuerpo.personas,
+        };
+
+        const personasNumero = Number(valores.personas);
+
+        const errores = [];
+
+        if (!valores.estudiante) errores.push("El nombre del estudiante es obligatorio.");
+        if (!valores.email) {
+            errores.push("El email es obligatorio.");
+        } else if (!valores.email.includes("@")) {
+            errores.push("El email debe contener un @ válido.");
+        }
+        if (!valores.fecha) errores.push("La fecha es obligatoria.");
+        if (!salasPermitidas.includes(valores.sala)) {
+            errores.push("Debe seleccionar una sala permitida.");
+        }
+        if (!turnosPermitidos.includes(valores.turno)) {
+            errores.push("Debe seleccionar un turno permitido.");
+        }
+        if (!Number.isInteger(personasNumero) || personasNumero < 1 || personasNumero > 6) {
+            errores.push("La cantidad de personas debe ser un entero entre 1 y 6.");
+        }
+
+        if (errores.length > 0) {
+            return res.status(400).render("reservas/nueva", {
+                titulo: "Nueva reserva",
+                salasPermitidas,
+                turnosPermitidos,
+                valores,
+                errores,
+            });
+        }
+
+        req.reservaValidada = {
+            estudiante: valores.estudiante,
+            email: valores.email,
+            sala: valores.sala,
+            fecha: valores.fecha,
+            turno: valores.turno,
+            personas: personasNumero,
+        };
+
+        next();
+    };
+
+    // Handler final del POST. Ya no repite la validación: solo agrega en memoria y redirige al listado.
+    function crearReserva(req, res) {
+        const nuevaReserva = {
+            id: proximoId,
+            ...req.reservaValidada,
+        };
+        proximoId += 1;
+        reservas.push(nuevaReserva);
+        res.redirect("/reservas");
+    };
+
     const app = express();
 
-    app.use(morgan("dev"));
-    app.use(identificarSolicitud);
-    app.use(medirDuracion);
+    app.set("view engine", "ejs");
+    app.set("views", path.join(__dirname, "..", "views"));
+    app.set("layout", "layouts/main");
+
+    // --- Pipeline global ---
+    app.use(morgan("dev")); // Middleware de terceros: registra cada solicitud en consola.
+    app.use(identificarSolicitud); // Middleware personalizado global #1.
+    app.use(medirDuracion); // Middleware personalizado global #2.
+    app.use(expressLayouts); // Habilita el layout principal para las vistas EJS.
+    app.use(express.static(path.join(__dirname, "..", "public"))); // Recursos estáticos incorporados.
+    app.use(express.urlencoded({ extended: true })); // Parser incorporado para formularios.
+    app.use(express.json()); // Parser incorporado para JSON (no lo usa el formulario, pero queda disponible).
+
+    // --- Rutas de aplicación ---
+    app.get("/", (req, res) => {
+        res.render("inicio", { titulo: "Inicio" });
+    });
+
+    app.get("/estado", (req, res) => {
+        res.json({
+            servicio: "activo",
+            reservas: reservas.length,
+            solicitudId: res.locals.solicitudId,
+        });
+    });
+
+    // --- Router de reservas ---
+    const reservasRouter = express.Router();
+
+    // Middleware de router: se aplica a todo lo montado bajo /reservas.
+    function prepararAreaReservas(req, res, next) {
+        res.locals.seccion = "Reservas de salas";
+        next();
+    }
+    reservasRouter.use(prepararAreaReservas);
+
+    reservasRouter.get("/", (req, res) => {
+        res.render("reservas/lista", {
+            titulo: "Reservas",
+            reservas,
+        });
+    });
+
+    // Debe declararse antes de /:id para que "nueva" no se interprete como un id.
+    reservasRouter.get("/nueva", (req, res) => {
+        res.render("reservas/nueva", {
+            titulo: "Nueva reserva",
+            salasPermitidas,
+            turnosPermitidos,
+            valores: {},
+            errores: [],
+        });
+    });
+
+    reservasRouter.get("/:id", (req, res) => {
+        const id = Number(req.params.id);
+        const reserva = reservas.find((item) => item.id === id);
+
+        if (!reserva) {
+            return res.status(404).render("no-encontrado", {
+                titulo: "Reserva no encontrada",
+                mensaje: "La reserva solicitada no existe.",
+            });
+        }
+
+        res.render("reservas/detalle", {
+            titulo: "Detalle de reserva",
+            reserva,
+        });
+    });
+
+    reservasRouter.post("/", validarReserva, crearReserva);
+
+    app.use("/reservas", reservasRouter);
+
+    // --- Página 404: al final de todo el pipeline ---
+    app.use((req, res) => {
+        res.status(404).render("no-encontrado", {
+            titulo: "Página no encontrada",
+            mensaje: "La dirección solicitada no existe.",
+        });
+    });
 
     app.listen(PORT, () => {
         console.log(`Aplicación escuchando en http://localhost:${PORT}`);

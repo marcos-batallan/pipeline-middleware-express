@@ -1,0 +1,25 @@
+<section class="detalle-reserva">
+    <h1><%= seccion %>: detalle</h1>
+
+    <dl class="ficha-reserva">
+        <dt>Estudiante:</dt>
+        <dd><%= reserva.estudiante %></dd>
+
+        <dt>email:</dt>
+        <dd><%= reserva.email %></dd>
+
+        <dt>Sala:</dt>
+        <dd><%= reserva.sala %></dd>
+
+        <dt>Fecha:</dt>
+        <dd><%= reserva.fecha %></dd>
+
+        <dt>Turno:</dt>
+        <dd><%= reserva.turno %></dd>
+
+        <dt>Cant. Personas:</dt>
+        <dd><%= reserva.personas %></dd>
+    </dl>
+
+    <p><a href="/reservas">Volver al listado de reservas</a></p>
+</section>

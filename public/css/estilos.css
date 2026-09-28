@@ -1,0 +1,193 @@
+:root {
+    --color-fondo: #f7f7fb;
+    --color-texto: #1f2430;
+    --color-primario: #2c5f6f;
+    --color-primario-oscuro: #1d4451;
+    --color-borde: #d7dae2;
+    --color-error-fondo: #fdecea;
+    --color-error-borde: #d94f4f;
+    --color-error-texto: #7a1f1f;
+    --radio: 8px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+}
+
+a {
+    color: var(--color-primario);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--color-primario-oscuro);
+    outline-offset: 2px;
+}
+
+.encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background-color: white;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.encabezado .salas {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--color-texto);
+}
+
+.encabezado nav a {
+    margin-left: 1rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contenedor {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.acciones-inicio {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.boton {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+    border-radius: var(--radio);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.boton:hover {
+    background-color: var(--color-primario-oscuro);
+}
+
+.boton-secundario {
+    background-color: white;
+    color: var(--color-primario);
+    border: 2px solid var(--color-primario);
+}
+
+.tarjetas-reservas {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.tarjeta-reserva {
+    background-color: white;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 1rem 1.25rem;
+}
+
+.tarjeta-reserva h2 {
+    margin-top: 0;
+}
+
+.estado-vacio {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: white;
+    border: 1px dashed var(--color-borde);
+    border-radius: var(--radio);
+}
+
+.ficha-reserva {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.5rem 1rem;
+    background-color: white;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 1.25rem;
+}
+
+.ficha-reserva dt {
+    font-weight: 600;
+    color: var(--color-primario-oscuro);
+}
+
+.ficha-reserva dd {
+    margin: 0;
+}
+
+.formulario-reserva form {
+    display: grid;
+    gap: 1rem;
+    max-width: 480px;
+    margin-top: 1.5rem;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.campo label {
+    font-weight: 600;
+}
+
+.campo input,
+.campo select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    font-size: 1rem;
+}
+
+.mensaje-error {
+    background-color: var(--color-error-fondo);
+    border: 1px solid var(--color-error-borde);
+    color: var(--color-error-texto);
+    border-radius: var(--radio);
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.mensaje-error ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+}
+
+.no-encontrado {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.pie {
+    text-align: center;
+    padding: 1.5rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--color-borde);
+}
