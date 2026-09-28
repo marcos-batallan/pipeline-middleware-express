@@ -4,11 +4,11 @@
     <% if (reservas.length === 0) { %>
         <p class="estado-vacio">
             Aún no se registraron reservas. ¡Sé el primero en
-            <a href="/reservas/neva">reservar una sala</a>!
+            <a href="/reservas/nueva">Reservar una sala</a>!
         </p>
     <% } else { %>
         <p>
-            <a class="boton" href="reservas/nueva">Nueva reserva</a>
+            <a class="boton" href="/reservas/nueva">Nueva reserva</a>
         </p>
         <ul class="tarjetas-reservas">
             <% reservas.forEach((reserva) => { %>
